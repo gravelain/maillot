@@ -44,6 +44,33 @@ services:
 
     restart: unless-stopped
 
+  api:
+    build:
+      context: ../maillot-api
+      dockerfile: Dockerfile.dev
+
+    container_name: maillot-api
+
+    volumes:
+      - ../maillot-api:/app
+      - /app/node_modules
+
+    ports:
+      - "${HOST_API_PORT}:3000"
+
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+      PORT: 3000
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - backend-network
+
+    restart: unless-stopped
+
 networks:
   backend-network:
     driver: bridge
